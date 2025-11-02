@@ -3,45 +3,48 @@
 </p>
 
 <p align="center">
-    <a href='https://img.shields.io/npm/l/resilience-kit'><img src="https://img.shields.io/npm/l/resilience-kit" alt="MIT License" /></a>
+    <a href='https://img.shields.io/npm/l/@sorodriguezz/nest-resilience'><img src="https://img.shields.io/npm/l/@sorodriguezz/nest-resilience" alt="MIT License" /></a>
 </p>
 
-**Resilience Kit** proporciona **patrones de resiliencia** como Circuit Breaker, Retry, Timeout y Fallback para **NestJS** (y Node.js). Permite configurar y aplicar estos patrones de forma sencilla mediante **interceptores**, **decoradores** y un **módulo dinámico**.
+English | [Español](./README.es.md)
 
-## 🚀 Características principales
+**Nest Resilience** provides **resilience patterns** such as Circuit Breaker, Retry, Timeout, and Fallback for **NestJS** (and Node.js). It allows you to configure and apply these patterns easily through **interceptors**, **decorators**, and a **dynamic module**.
 
-✅ **Circuit Breaker**: Protege tu aplicación de fallos repetitivos o servicios inestables.  
-✅ **Retry**: Reintenta automáticamente una operación fallida.  
-✅ **Timeout**: Detiene las operaciones que toman demasiado tiempo.  
-✅ **Fallback**: Devuelve una respuesta alternativa cuando una operación falla.  
+## 🚀 Main Features
 
-## 📦 Instalación
+- ✅ **Circuit Breaker**: Protects your application from repetitive failures or unstable services.
+- ✅ **Retry**: Automatically retries a failed operation.
+- ✅ **Timeout**: Stops operations that take too long.
+- ✅ **Fallback**: Returns an alternative response when an operation fails.
 
-Puedes realizar la instalación con [NPM](https://www.npmjs.com/):
-```bash
-npm install resilience-kit
+## 📦 Installation
+
+Install using NPM￼:
+
+```
+npm install @sorodriguezz/nest-resilience
 ```
 
-O usando [Yarn](https://yarnpkg.com/):
+Or with Yarn￼:
 
-```bash
-yarn add resilience-kit
+```
+yarn add @sorodriguezz/nest-resilience
 ```
 
-### Requisitos
+### Requirements
 
-- NestJS (v9 o superior recomendado).
-- Node.js 16+ (para soporte de ES2020).
+- NestJS (v9 or later recommended)
+- Node.js 16+ (for ES2020 support)
 
-## 📌 Uso básico en NestJS
+## 📌 Basic Usage in NestJS
 
-### 1️⃣ Importar el módulo
+### 1️⃣ Import the module
 
-En tu `AppModule` (o el módulo donde lo necesites), importa `ResilienceModule` y configura los patrones deseados:
+In your `AppModule` (or any module where you need it), import `ResilienceModule` and configure the desired patterns:
 
 ```typescript
 import { Module } from "@nestjs/common";
-import { ResilienceModule } from "resilience-kit";
+import { ResilienceModule } from "@sorodriguezz/nest-resilience";
 
 @Module({
   imports: [
@@ -71,7 +74,7 @@ import { ResilienceModule } from "resilience-kit";
 export class AppModule {}
 ```
 
-Si necesitas cargar la configuración de forma asíncrona, usa `forRootAsync()`:
+If you need to load configuration asynchronously, use `forRootAsync()`:
 
 ```typescript
 ResilienceModule.forRootAsync({
@@ -82,11 +85,9 @@ ResilienceModule.forRootAsync({
 });
 ```
 
----
+### 2️⃣ Apply decorators on endpoints
 
-### 2️⃣ Aplicar decoradores en los endpoints
-
-Puedes usar los decoradores que provee la librería en tus controladores de NestJS:
+You can use the provided decorators directly in your NestJS controllers:
 
 ```typescript
 import { Controller, Get } from "@nestjs/common";
@@ -95,21 +96,21 @@ import {
   UseRetry,
   UseTimeout,
   UseFallback,
-} from "resilience-kit";
+} from "@sorodriguezz/nest-resilience";
 
 @Controller("demo")
 export class DemoController {
   @Get("retry")
   @UseRetry()
   getWithRetry() {
-    throw new Error("Forzando error para reintento");
+    throw new Error("Forcing error for retry");
   }
 
   @Get("timeout")
   @UseTimeout()
   async getWithTimeout() {
     return new Promise((resolve) =>
-      setTimeout(() => resolve("Respuesta tardía"), 5000)
+      setTimeout(() => resolve("Late response"), 5000)
     );
   }
 
@@ -125,84 +126,82 @@ export class DemoController {
   @Get("fallback")
   @UseFallback()
   getWithFallback() {
-    throw new Error("Forzamos error para usar fallbackMethod");
+    throw new Error("Forced error to use fallbackMethod");
   }
 }
 ```
 
-> **Nota**: Cuando un patrón no está habilitado (`enabled: false`), el interceptor simplemente no hace nada.
+> **Note**: When a pattern is not enabled (enabled: false), the interceptor simply does nothing.
 
-## Uso a nivel de servicios
+## 🧩 Usage at Service Level
 
-Puedes usar el patron que quieras a nivel de servicio como:
+You can use any pattern directly within a service, for example:
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { RetryService } from 'resilience-kit';
+import { Injectable } from "@nestjs/common";
+import { RetryService } from "@sorodriguezz/nest-resilience";
 
 @Injectable()
 export class AppService {
-  constructor(private readonly retryService: RetryService) {} // Inyectamos el servicio
+  constructor(private readonly retryService: RetryService) {} // Inject the service
 
   async doOperationWithRetry(): Promise<string> {
-    // "execute()" reintentará tu función si falla
+    // "execute()" will retry your function if it fails
     return this.retryService.execute(async () => {
-      // Lógica que podría fallar
       if (Math.random() < 0.7) {
-        throw new Error('Random error');
+        throw new Error("Random error");
       }
-      return 'Success after random error!';
+      return "Success after random error!";
     });
   }
 }
 ```
 
-> **Nota:** Al usarlo de esta manera se vuelve más repetitivo pero se tiene un control más exacto. En cambio por Decoradorador/Interceptor separa la lógica de los patrones con la lógica de negocio (volviendo el código mas limpio). Pero se tiene menos control, ya que es en tiempo de Request.
+> **Note**: Using it this way gives you finer control but makes the code more repetitive. Using Decorators/Interceptors separates resilience logic from business logic (cleaner code) but with less runtime control.
 
+## 🔗 Chaining Patterns
 
-## 🔗 Uso en cadena
-
-Puedes aplicar múltiples patrones, todos a la vez y simultáneamente con un solo decorador (Aplicandolos en orden lógico):
+You can apply multiple patterns simultaneously with a single decorator (in logical order):
 
 ```typescript
 @Get('all-patterns')
-@UseResilienceChain() // Aplica Timeout, Retry, Circuit Breaker, Fallback, etc.
+@UseResilienceChain() // Applies Timeout, Retry, Circuit Breaker, Fallback, etc.
 myEndpoint() {
-  // Lógica del endpoint
+  // Endpoint logic
 }
 ```
 
-O puedes habilitar los que desees usar de la siguiente manera:
+Or enable specific ones like this:
 
 ```typescript
-  @Get('timeout-retry')
-  @UseResilienceChain({ timeout: true, retry: true }) // Solo aplica Retry y TimeOut
-  getTimeoutAndRetry() {
-    return this.testService.mightFailRandomly();
-  }
+@Get('timeout-retry')
+@UseResilienceChain({ timeout: true, retry: true }) // Applies only Retry and Timeout
+getTimeoutAndRetry() {
+  return this.testService.mightFailRandomly();
+}
 ```
 
-## 📡 Logs
+## 📡 Logging
 
-También puedes loggear la configuración inicial al arrancar la aplicación:
+You can log the initial configuration at startup:
 
 ```typescript
-  imports: [
-    ResilienceModule.forRoot({
-      logOnStartup: true, // Para loggear apenas arranca
-      circuitBreaker: {
-        enabled: true,
-        timeout: 2000,
-        errorThresholdPercentage: 50,
-        resetTimeout: 3000,
-      },
-    }),
-  ],
+imports: [
+  ResilienceModule.forRoot({
+    logOnStartup: true, // Logs when the app starts
+    circuitBreaker: {
+      enabled: true,
+      timeout: 2000,
+      errorThresholdPercentage: 50,
+      resetTimeout: 3000,
+    },
+  }),
+],
 ```
 
-## 🔍 Ver configuraciones
+## 🔍 View Configuration
 
-Puedes ver las configuraciones según un patrón a través del servicio, de la siguiente manera:
+You can inspect configurations of a pattern through the service like this:
 
 ```typescript
 Module({
@@ -214,15 +213,15 @@ Module({
       },
     }),
   ],
-  providers: [ResilienceService], // Proveer el servicio
-})
+  providers: [ResilienceService],
+});
 ```
 
-Para utilizarlo dentro de la aplicación, se inyecta en el constructor y se utiliza de la siguiente manera:
+Then inject and use it inside your application:
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { ResilienceService } from 'resilience-kit';
+import { Injectable } from "@nestjs/common";
+import { ResilienceService } from "@sorodriguezz/nest-resilience";
 
 export class AppService {
   private attemptCount = 0;
@@ -230,26 +229,30 @@ export class AppService {
   constructor(private readonly resilienceService: ResilienceService) {}
 
   alwaysFails() {
-    console.log(this.rs.getCircuitBreakerOptions()); // Obtiene en fallback
-    throw new Error('I always fail!');
+    console.log(this.rs.getCircuitBreakerOptions());
+    throw new Error("I always fail!");
   }
 
   /** output:
-    {
-      enabled: true,
-      errorThresholdPercentage: 50,
-      resetTimeout: 5000,
-      timeout: 1000
-    }
-   * /
+  {
+    enabled: true,
+    errorThresholdPercentage: 50,
+    resetTimeout: 5000,
+    timeout: 1000
+  }
+  **/
+}
 ```
 
-## 📌 Uso básico en NodeJS con Express
+## 📌 Basic Usage in NodeJS with Express
 
-1️⃣ Importa **resilience kit** en tu proyecto usando el patron que quieras y con la configuración que quieras:
+1️⃣ Import **nest-resilience** in your project and configure the patterns you want:
 
 ```javascript
-const { RetryService, FallbackService } = require("resilience-kit");
+const {
+  RetryService,
+  FallbackService,
+} = require("@sorodriguezz/nest-resilience");
 
 const retryService = new RetryService({
   enabled: true,
@@ -259,19 +262,17 @@ const retryService = new RetryService({
 
 const fallbackService = new FallbackService({
   enabled: true,
-  fallbackMethod: () => ({ message: "Fallback used2!" }),
+  fallbackMethod: () => ({ message: "Fallback used!" }),
 });
 ```
 
-2️⃣ Aplica en tus EndPoints, para usar solo debes ejecutar los métodos a traves de sus instancias:
+## 2️⃣ Apply them in your endpoints:
 
 ```javascript
 app.get("/test/fallback", (req, res) => {
   try {
-    // Forzamos error
     throw new Error("Something failed");
   } catch (err) {
-    // Llamamos a fallback
     const fallbackValue = fallbackService.executeFallback();
     res.json({ data: fallbackValue });
   }
@@ -280,7 +281,6 @@ app.get("/test/fallback", (req, res) => {
 app.get("/test/retry", async (req, res) => {
   try {
     const result = await retryService.execute(() => {
-      // Lógica que falla
       if (Math.random() < 0.7) throw new Error("Random fail");
       return "Success after retry!";
     });
@@ -291,6 +291,7 @@ app.get("/test/retry", async (req, res) => {
 });
 ```
 
-## 📜 Licencia
+## 📜 License
 
-Este proyecto se distribuye bajo la licencia **MIT**. Puedes usarlo libremente en entornos personales y comerciales.
+This project is distributed under the MIT License.
+You can use it freely in both personal and commercial environments.
