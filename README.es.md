@@ -298,4 +298,4 @@ app.get("/test/retry", async (req, res) => {
 
 ## 📜 Licencia
 
-Este proyecto se distribuye bajo la licencia **MIT**. Puedes usarlo libremente en entornos personales y comerciales.
+ISC

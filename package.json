@@ -1,6 +1,6 @@
 {
   "name": "@sorodriguez/nest-resilience",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Module to improve the reliability and fault tolerance of your applications",
   "main": "dist/index.js",
   "module": "dist/index.js",
