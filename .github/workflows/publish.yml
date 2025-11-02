@@ -2,23 +2,21 @@ name: Publish to npm
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org/"
 
       - name: Install dependencies
         run: npm install
@@ -26,7 +24,25 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check if version exists on npm
+        id: check-version
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if npm view $PACKAGE_NAME@$PACKAGE_VERSION version 2>/dev/null; then
+            echo "version_exists=true" >> $GITHUB_OUTPUT
+            echo "Version $PACKAGE_VERSION already exists on npm"
+          else
+            echo "version_exists=false" >> $GITHUB_OUTPUT
+            echo "Version $PACKAGE_VERSION does not exist, will publish"
+          fi
+
       - name: Publish to npm
-        run: npm publish
+        if: steps.check-version.outputs.version_exists == 'false'
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Skip publish
+        if: steps.check-version.outputs.version_exists == 'true'
+        run: echo "Skipping publish - version already exists on npm"
