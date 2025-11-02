@@ -1,7 +1,7 @@
 {
   "name": "@sorodriguez/nest-resilience",
-  "version": "1.0.3",
-  "description": "Módulo para mejorar la confiabilidad y la tolerancia a fallas de sus aplicaciones",
+  "version": "1.0.4",
+  "description": "Module to improve the reliability and fault tolerance of your applications",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,5 +38,5 @@
     "fallback"
   ],
   "author": "sorodriguezz",
-  "license": "MIT"
+  "license": "ISC"
 }
