@@ -1,5 +1,5 @@
 {
-  "name": "@sorodriguezz/nest-resilience",
+  "name": "@sorodriguez/nest-resilience",
   "version": "1.0.3",
   "description": "Módulo para mejorar la confiabilidad y la tolerancia a fallas de sus aplicaciones",
   "main": "dist/index.js",
